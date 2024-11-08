@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propagator</title>
+
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            text-align: center;
+            padding: 40px 0;
+            background-color: white;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: transparent;
+            background-image: url('https://media.giphy.com/media/3og0IGjLXRttYbbtcc/giphy.gif');
+            background-size: cover;
+            background-position: center;
+            -webkit-background-clip: text;
+            background-clip: text;
+            filter: brightness(0.8);
+            margin: 0;
+        }
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            flex-grow: 1;
+            max-width: 90vw;
+            margin: 0 auto;
+        }
+        .quadrant {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 300px;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        input[type="number"] {
+            padding: 6px;
+            width: 70px;
+            font-size: 1em;
+            color: #333;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="number"]::placeholder {
+            color: #cccccc;
+        }
+        button {
+            padding: 8px 16px;
+            font-size: 1em;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            width: 80px;
+            transition: background-color 0.3s ease;
+        }
+        button.stop {
+            background-color: #FF4D4D;
+        }
+        button.stop:hover {
+            background-color: #FF1A1A;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .graph {
+            width: 100%;
+            height: 200px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .graph-label {
+            position: absolute;
+            font-size: 3em;
+            font-weight: bold;
+            opacity: 0.1;
+        }
+        .graph-A .graph-label { color: red; }
+        .graph-B .graph-label { color: green; }
+        .graph-C .graph-label { color: blue; }
+        .graph-D .graph-label { color: orange; }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #f4f4f4;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .flavor-logo {
+            margin-left: 5px;
+            display: inline-flex;
+        }
+        .flavor-logo img {
+            width: 80px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .flavor-logo img:hover {
+            transform: scale(1.1);
+            opacity: 0.8;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <h1>Propagator</h1>
+    </header>
+
+    <!-- Main Content Section -->
+    <main class="content">
+        <!-- Quadrant 1 -->
+        <div class="quadrant">
+            <div class="control-group">
+                <input type="number" id="temperature1" name="temperature1" placeholder="Tª" step="0.1">
+                <input type="number" id="rpm1" name="rpm1" placeholder="RPM" step="10">
+                <button type="button" onclick="toggleStartStop(this)">Start</button>
+            </div>
+            <div class="graph graph-A">
+                <span class="graph-label">A</span>
+                <canvas id="chartA"></canvas>
+            </div>
+        </div>
+
+        <!-- Quadrant 2 -->
+        <div class="quadrant">
+            <div class="control-group">
+                <input type="number" id="temperature2" name="temperature2" placeholder="Tª" step="0.1">
+                <input type="number" id="rpm2" name="rpm2" placeholder="RPM" step="10">
+                <button type="button" onclick="toggleStartStop(this)">Start</button>
+            </div>
+            <div class="graph graph-B">
+                <span class="graph-label">B</span>
+                <canvas id="chartB"></canvas>
+            </div>
+        </div>
+
+        <!-- Quadrant 3 -->
+        <div class="quadrant">
+            <div class="control-group">
+                <input type="number" id="temperature3" name="temperature3" placeholder="Tª" step="0.1">
+                <input type="number" id="rpm3" name="rpm3" placeholder="RPM" step="10">
+                <button type="button" onclick="toggleStartStop(this)">Start</button>
+            </div>
+            <div class="graph graph-C">
+                <span class="graph-label">C</span>
+                <canvas id="chartC"></canvas>
+            </div>
+        </div>
+
+        <!-- Quadrant 4 -->
+        <div class="quadrant">
+            <div class="control-group">
+                <input type="number" id="temperature4" name="temperature4" placeholder="Tª" step="0.1">
+                <input type="number" id="rpm4" name="rpm4" placeholder="RPM" step="10">
+                <button type="button" onclick="toggleStartStop(this)">Start</button>
+            </div>
+            <div class="graph graph-D">
+                <span class="graph-label">D</span>
+                <canvas id="chartD"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Section with "Powered by FlavorReactor" -->
+    <footer>
+        <span>Powered by</span>
+        <div class="flavor-logo">
+            <a href="https://curro1999.github.io/FlavorReactor/" target="_blank">
+                <img src="flavor.png" alt="FlavorReactor Logo">
+            </a>
+        </div>
+    </footer>
+
+    <!-- Script para mostrar solo ejes en las gráficas -->
+    <script>
+        function createEmptyAxes(chartId) {
+            new Chart(document.getElementById(chartId), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        borderWidth: 0 
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Time' },
+                            ticks: { color: '#aaa' },
+                            grid: { color: 'rgba(0,0,0,0.1)' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Temperature (°C)' },
+                            ticks: { color: '#aaa' },
+                            grid: { color: 'rgba(0,0,0,0.1)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        createEmptyAxes('chartA');
+        createEmptyAxes('chartB');
+        createEmptyAxes('chartC');
+        createEmptyAxes('chartD');
+    </script>
+</body>
+</html>
